@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Kapitel 4 - Mord im Paradies</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Kapitel 4";
+        var mkdocs_page_input_path = "kapitel4.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Mord im Paradies
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../kapitel1/">Kapitel 1</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../kapitel2/">Kapitel 2</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../kapitel3/">Kapitel 3</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Kapitel 4</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#aufgabe">Aufgabe</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ergebnis">Ergebnis</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../kapitel5/">Kapitel 5</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Mord im Paradies</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Kapitel 4</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="kapitel-4-der-entscheidende-hinweis">Kapitel 4: Der entscheidende Hinweis</h1>
+<p>Du bist dem Mörder auf der Spur! Ein entscheidender Hinweis verbirgt sich in den Daten, aber du musst eine letzte Abfrage durchführen, um ihn zu finden.</p>
+<h2 id="aufgabe">Aufgabe</h2>
+<p>Finde heraus, welche Gäste an mehr als einer Transaktion beteiligt sind. Dies könnte der entscheidende Hinweis auf den Täter sein.</p>
+<textarea id="sql-input" rows="4" cols="50">SELECT party_a, COUNT(*) AS transactions FROM transactions GROUP BY party_a HAVING transactions > 1;</textarea>
+<p><br>
+<button id="run-sql" onclick="runSQL()" disabled>Abfrage ausführen</button></p>
+<h2 id="ergebnis">Ergebnis</h2>
+<div id="results"></div>
+
+<p><button onclick="resetDatabase()">Datenbank zurücksetzen</button></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js"></script>
+<script>
+  var db;
+
+  // Datenbank erstellen oder aus dem localStorage laden
+  function loadDatabase() {
+    var savedDb = localStorage.getItem('db');
+    if (savedDb) {
+      // Wenn Daten im localStorage vorhanden sind, lade sie
+      var uintArray = new Uint8Array(atob(savedDb).split("").map(function(c) {
+        return c.charCodeAt(0);
+      }));
+      db = new SQL.Database(uintArray);
+      document.getElementById('run-sql').disabled = false;  // Aktiviert die SQL-Abfrage-Schaltfläche
+    } else {
+      // Wenn keine Daten vorhanden sind, erstelle die Tabelle und füge Daten ein
+      initSqlJs({ locateFile: filename => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/${filename}` }).then(SQL => {
+        db = new SQL.Database();
+        db.run(`CREATE TABLE transactions (
+          id INT,
+          party_a TEXT,
+          party_b TEXT,
+          amount INT
+        );`);
+        db.run(`INSERT INTO transactions (id, party_a, party_b, amount) VALUES 
+          (1, 'Isabella Vance', 'Vera Jansen', 100000),
+          (2, 'Luca DeLuca', 'Vera Jansen', 250000)
+        `);
+        saveDatabase();  // Daten sofort nach Initialisierung speichern
+        document.getElementById('run-sql').disabled = false;  // Aktiviert die SQL-Abfrage-Schaltfläche
+      });
+    }
+  }
+
+  // Datenbank im localStorage speichern
+  function saveDatabase() {
+    var binaryArray = db.export();
+    var base64String = btoa(String.fromCharCode.apply(null, binaryArray));
+    localStorage.setItem('db', base64String);
+  }
+
+  // Funktion zum Ausführen von SQL-Abfragen
+  function runSQL() {
+    var sql = document.getElementById('sql-input').value;
+    try {
+      if (!db) {
+        document.getElementById('results').innerHTML = "Datenbank wird geladen, bitte warte einen Moment.";
+        return;
+      }
+
+      var results = db.exec(sql);
+      if (results.length) {
+        document.getElementById('results').innerHTML = "Richtig! Ergebnis: " + JSON.stringify(results, null, 2);
+      } else {
+        document.getElementById('results').innerHTML = "Keine Ergebnisse.";
+      }
+
+      // Datenbank nach jeder Abfrage speichern
+      saveDatabase();
+
+    } catch (e) {
+      document.getElementById('results').innerHTML = "Fehler: " + e.message;
+    }
+  }
+
+  // Datenbank zurücksetzen
+  function resetDatabase() {
+    localStorage.removeItem('db');
+    loadDatabase();  // Neue Datenbank erstellen
+    document.getElementById('results').innerHTML = "Datenbank zurückgesetzt.";
+  }
+
+  loadDatabase();  // Initialisiere die Datenbank beim Laden der Seite
+</script>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../kapitel3/" class="btn btn-neutral float-left" title="Kapitel 3"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../kapitel5/" class="btn btn-neutral float-right" title="Kapitel 5">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../kapitel3/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../kapitel5/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
